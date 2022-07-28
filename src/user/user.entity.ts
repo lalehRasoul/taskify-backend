@@ -6,6 +6,7 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User {
@@ -16,12 +17,15 @@ export class User {
   username: string;
 
   @Column()
+  @Exclude({ toPlainOnly: true })
   password: string;
 
   @Column({ unique: true })
   email: string;
 
-  @ManyToMany(() => Project, (project) => project.users)
+  @ManyToMany(() => Project, (project) => project.users, {
+    cascade: true,
+  })
   @JoinTable()
   projects: Project[];
 }

@@ -16,12 +16,18 @@ export class Task {
   @Column({ default: false })
   checked: boolean;
 
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.id, {
+    cascade: true,
+  })
   owner: User;
 
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.id, {
+    cascade: true,
+  })
   asign: User;
 
-  @ManyToOne(() => Project, (project) => project.id)
+  @ManyToOne(() => Project, (project) => project.id, {
+    cascade: true,
+  })
   project: Project;
 }

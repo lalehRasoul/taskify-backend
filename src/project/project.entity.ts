@@ -15,7 +15,9 @@ export class Project {
   @Column({ unique: true })
   name: string;
 
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.id, {
+    cascade: true,
+  })
   owner: User;
 
   @ManyToMany(() => User, (user) => user.projects)

@@ -6,22 +6,25 @@ import { ProjectModule } from './project/project.module';
 import { Project } from './project/project.entity';
 import { TaskModule } from './task/task.module';
 import { Task } from './task/task.entity';
+import { AuthModule } from './auth/auth.module';
+import { config } from './constants';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'taskify',
-      database: 'taskify',
+      host: config.DATABASE.HOST,
+      port: config.DATABASE.PORT,
+      username: config.DATABASE.USERNAME,
+      password: config.DATABASE.PASSWORD,
+      database: config.DATABASE.NAME,
       entities: [User, Project, Task],
       synchronize: true,
     }),
     UserModule,
     ProjectModule,
     TaskModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
