@@ -40,8 +40,6 @@ export class Task {
   })
   asign: Relation<User>;
 
-  @ManyToOne(() => Project, (project) => project.id, {
-    cascade: true,
-  })
+  @ManyToOne(() => Project, (project) => project.id)
   project: Relation<Project>;
 }

@@ -35,6 +35,7 @@ export class ProjectService {
       relations: {
         users: true,
         owner: true,
+        tasks: true,
       },
     });
   }
@@ -50,6 +51,7 @@ export class ProjectService {
       relations: {
         users: true,
         owner: true,
+        tasks: true,
       },
     });
   }
@@ -65,6 +67,33 @@ export class ProjectService {
       relations: {
         users: true,
         owner: true,
+        tasks: true,
+      },
+    });
+  }
+
+  async addUserToProject(project: Project, user: User): Promise<Project> {
+    project.users.push(user);
+    await this.projectRepository.save(project);
+    return this.projectRepository.findOne({
+      where: { id: project.id },
+      relations: {
+        users: true,
+        owner: true,
+        tasks: true,
+      },
+    });
+  }
+
+  async removeUserFromProject(project: Project, user: User): Promise<Project> {
+    project.users = project.users.filter((el) => el.id !== user.id);
+    await this.projectRepository.save(project);
+    return this.projectRepository.findOne({
+      where: { id: project.id },
+      relations: {
+        users: true,
+        owner: true,
+        tasks: true,
       },
     });
   }

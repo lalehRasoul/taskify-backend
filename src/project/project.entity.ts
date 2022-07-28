@@ -1,3 +1,4 @@
+import { Task } from 'src/task/task.entity';
 import { User } from 'src/user/user.entity';
 import {
   Entity,
@@ -9,6 +10,7 @@ import {
   UpdateDateColumn,
   JoinColumn,
   Relation,
+  OneToMany,
 } from 'typeorm';
 
 @Entity('project')
@@ -38,4 +40,9 @@ export class Project {
   @ManyToMany(() => User, (user) => user.projects)
   @JoinColumn()
   users: Relation<User[]>;
+
+  @OneToMany(() => Task, (task) => task.project, {
+    cascade: true,
+  })
+  tasks: Relation<Task[]>;
 }

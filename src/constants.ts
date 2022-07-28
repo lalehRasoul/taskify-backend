@@ -4,6 +4,9 @@ export const messages = {
   projectExist: 'The project already exist.',
   projectIdRequred: 'Project id required.',
   projectNotFound: 'Project not found.',
+  doesNotHavePermission: 'User does not have permission.',
+  taskNotFound: 'Task not found.',
+  leftPermission: "You can't left this project.",
 };
 
 export const config = {
