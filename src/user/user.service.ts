@@ -13,7 +13,6 @@ export class UserService {
   ) {}
 
   async createUser(newUser: CreateUserDto): Promise<User> {
-    newUser.password = await bcrypt.hash(newUser.password, 8);
     const user = await this.usersRepository.create(newUser);
     await this.usersRepository.save(user);
     return user;
@@ -47,5 +46,9 @@ export class UserService {
     } else {
       return null;
     }
+  }
+
+  async findUserById(id: number): Promise<User> {
+    return this.usersRepository.findOneBy({ id });
   }
 }

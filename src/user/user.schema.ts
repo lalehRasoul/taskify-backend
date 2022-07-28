@@ -27,3 +27,9 @@ export class LoginDto {
   @IsNotEmpty()
   password: string;
 }
+
+export class UserPayload {
+  id: number;
+
+  password: string;
+}

@@ -24,9 +24,7 @@ export class AuthController {
 
   @ApiTags('auth')
   @Post('signup')
-  async signup(
-    @Body() newUser: CreateUserDto,
-  ): Promise<{ user: User; access_token: string }> {
+  async signup(@Body() newUser: CreateUserDto): Promise<any> {
     const user: User = await this.userService.findUserByUsernameOrEmail(
       newUser.username,
     );
@@ -38,11 +36,11 @@ export class AuthController {
     };
   }
 
+  // { user: User; access_token: string }
+
   @ApiTags('auth')
   @Post('signin')
-  async signin(
-    @Body() user: LoginDto,
-  ): Promise<{ user: User; access_token: string }> {
+  async signin(@Body() user: LoginDto): Promise<any> {
     const targetUser: User = await this.userService.findUserByCredentials(user);
     if (targetUser === null) throw new NotFoundException(messages.userNotFound);
     return {

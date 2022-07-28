@@ -5,10 +5,16 @@ import {
   PrimaryGeneratedColumn,
   ManyToMany,
   JoinTable,
+  BeforeInsert,
+  CreateDateColumn,
+  UpdateDateColumn,
+  AfterLoad,
+  BeforeUpdate,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import * as bcrypt from 'bcrypt';
 
-@Entity()
+@Entity('user')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -20,12 +26,35 @@ export class User {
   @Exclude({ toPlainOnly: true })
   password: string;
 
+  @Exclude({ toPlainOnly: true })
+  private tempPassword: string;
+
   @Column({ unique: true })
   email: string;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 
   @ManyToMany(() => Project, (project) => project.users, {
     cascade: true,
   })
   @JoinTable()
   projects: Project[];
+
+  @BeforeInsert() async hashPassword() {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
+
+  @AfterLoad() loadTempPassword() {
+    this.tempPassword = this.password;
+  }
+
+  @BeforeUpdate() async encryptPassword() {
+    if (this.tempPassword !== this.password) {
+      this.password = await bcrypt.hash(this.password, 10);
+    }
+  }
 }
