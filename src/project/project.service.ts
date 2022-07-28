@@ -16,6 +16,7 @@ export class ProjectService {
     const newProject: Project = await this.projectRepository.create({
       owner,
       name,
+      users: [owner],
     });
     await this.projectRepository.save(newProject);
     return newProject;
@@ -29,15 +30,28 @@ export class ProjectService {
 
   async findProjectsByOwner(ownerId: number): Promise<Project[]> {
     const where: any = { owner: ownerId };
-    return await this.projectRepository.find({ where });
+    return await this.projectRepository.find({
+      where,
+      relations: {
+        users: true,
+        owner: true,
+      },
+    });
   }
 
-  async findOwnerProjectById(
-    ownerId: number,
+  async findProject(
     projectId: number,
+    ownerId?: number | undefined,
   ): Promise<Project> {
-    const where: any = { owner: ownerId, id: projectId };
-    return await this.projectRepository.findOne({ where });
+    const where: any = { id: projectId };
+    if (!!projectId) where.owner = ownerId;
+    return await this.projectRepository.findOne({
+      where,
+      relations: {
+        users: true,
+        owner: true,
+      },
+    });
   }
 
   async removeProject(project: Project): Promise<void> {
@@ -46,6 +60,12 @@ export class ProjectService {
 
   async updateProject(projectId: number, name: string): Promise<Project> {
     await this.projectRepository.update({ id: projectId }, { name });
-    return this.projectRepository.findOneBy({ id: projectId });
+    return this.projectRepository.findOne({
+      where: { id: projectId },
+      relations: {
+        users: true,
+        owner: true,
+      },
+    });
   }
 }

@@ -7,10 +7,16 @@ import {
   ManyToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  JoinColumn,
+  Relation,
 } from 'typeorm';
 
 @Entity('project')
 export class Project {
+  constructor(partial: Partial<Project>) {
+    Object.assign(this, partial);
+  }
+
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -26,8 +32,10 @@ export class Project {
   @ManyToOne(() => User, (user) => user.id, {
     cascade: true,
   })
-  owner: User;
+  @JoinColumn({ name: 'ownerId' })
+  owner: Relation<User>;
 
   @ManyToMany(() => User, (user) => user.projects)
-  users: User[];
+  @JoinColumn()
+  users: Relation<User[]>;
 }

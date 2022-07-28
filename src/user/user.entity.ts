@@ -10,6 +10,7 @@ import {
   UpdateDateColumn,
   AfterLoad,
   BeforeUpdate,
+  Relation,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
@@ -42,7 +43,7 @@ export class User {
     cascade: true,
   })
   @JoinTable()
-  projects: Project[];
+  projects: Relation<Project[]>;
 
   @BeforeInsert() async hashPassword() {
     this.password = await bcrypt.hash(this.password, 10);

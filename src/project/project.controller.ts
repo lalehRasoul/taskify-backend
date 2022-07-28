@@ -68,17 +68,11 @@ export class ProjectController {
   @ApiTags('project')
   @ApiResponse({
     status: 200,
-    description: 'Removes the user project.',
+    description: 'returns project.',
   })
-  @Delete(':id')
-  async remoeUserProject(
-    @Req() req: UserContext,
-    @Param('id') id: number,
-  ): Promise<void> {
-    const targetProject: Project =
-      await this.projectService.findOwnerProjectById(req.user.id, id);
-    if (!targetProject) throw new NotFoundException(messages.projectNotFound);
-    await this.projectService.removeProject(targetProject);
+  @Get(':id')
+  async getProject(@Param('id') id: number): Promise<Project> {
+    return this.projectService.findProject(id);
   }
 
   @ApiTags('project')
@@ -86,14 +80,34 @@ export class ProjectController {
     status: 200,
     description: 'Removes the user project.',
   })
+  @Delete(':id')
+  async removeUserProject(
+    @Req() req: UserContext,
+    @Param('id') id: number,
+  ): Promise<void> {
+    const targetProject: Project = await this.projectService.findProject(
+      id,
+      req.user.id,
+    );
+    if (!targetProject) throw new NotFoundException(messages.projectNotFound);
+    await this.projectService.removeProject(targetProject);
+  }
+
+  @ApiTags('project')
+  @ApiResponse({
+    status: 200,
+    description: 'The project has been successfully updated.',
+  })
   @Put(':id')
   async updateUserProject(
     @Req() req: UserContext,
     @Param('id') id: number,
     @Body() body: CreateProjectDto,
   ): Promise<Project> {
-    const targetProject: Project =
-      await this.projectService.findOwnerProjectById(req.user.id, id);
+    const targetProject: Project = await this.projectService.findProject(
+      id,
+      req.user.id,
+    );
     if (!targetProject) throw new NotFoundException(messages.projectNotFound);
     return this.projectService.updateProject(targetProject.id, body.name);
   }

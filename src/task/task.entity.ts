@@ -7,6 +7,7 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  Relation,
 } from 'typeorm';
 
 @Entity('task')
@@ -32,15 +33,15 @@ export class Task {
   @ManyToOne(() => User, (user) => user.id, {
     cascade: true,
   })
-  owner: User;
+  owner: Relation<User>;
 
   @ManyToOne(() => User, (user) => user.id, {
     cascade: true,
   })
-  asign: User;
+  asign: Relation<User>;
 
   @ManyToOne(() => Project, (project) => project.id, {
     cascade: true,
   })
-  project: Project;
+  project: Relation<Project>;
 }
