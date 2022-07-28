@@ -1,6 +1,9 @@
 export const messages = {
-  userExist: 'کاربر قبلا ثبت نام کرده است',
-  userNotFound: 'کاربر مورد نظر یافت نشد',
+  userExist: 'User already signed up.',
+  userNotFound: 'User not found.',
+  projectExist: 'The project already exist.',
+  projectIdRequred: 'Project id required.',
+  projectNotFound: 'Project not found.',
 };
 
 export const config = {

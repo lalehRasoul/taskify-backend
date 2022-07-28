@@ -3,11 +3,12 @@ import {
   ClassSerializerInterceptor,
   ConflictException,
   Controller,
+  HttpCode,
   NotFoundException,
   Post,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { messages } from 'src/constants';
 import { User } from 'src/user/user.entity';
 import { CreateUserDto, LoginDto } from 'src/user/user.schema';
@@ -23,10 +24,24 @@ export class AuthController {
   ) {}
 
   @ApiTags('auth')
+  @ApiResponse({
+    status: 201,
+    description: 'The user has been successfully created.',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'User already exist.',
+  })
+  @HttpCode(201)
   @Post('signup')
   async signup(@Body() newUser: CreateUserDto): Promise<any> {
-    const user: User = await this.userService.findUserByUsernameOrEmail(
+    let user: User = await this.userService.findUserByUsernameOrEmail(
       newUser.username,
+    );
+    if (user !== null) throw new ConflictException(messages.userExist);
+    user = await this.userService.findUserByUsernameOrEmail(
+      null,
+      newUser.email,
     );
     if (user !== null) throw new ConflictException(messages.userExist);
     const createdUser: User = await this.userService.createUser(newUser);
@@ -36,9 +51,15 @@ export class AuthController {
     };
   }
 
-  // { user: User; access_token: string }
-
   @ApiTags('auth')
+  @ApiResponse({
+    status: 200,
+    description: 'The user has been successfully logged in.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found.',
+  })
   @Post('signin')
   async signin(@Body() user: LoginDto): Promise<any> {
     const targetUser: User = await this.userService.findUserByCredentials(user);

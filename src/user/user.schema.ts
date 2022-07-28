@@ -1,6 +1,7 @@
 import { IsEmail, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
+import { User } from './user.entity';
 
 export class CreateUserDto {
   @ApiProperty({ default: 'test' })
@@ -32,4 +33,8 @@ export class UserPayload {
   id: number;
 
   password: string;
+}
+
+export class UserContext {
+  user: User;
 }
