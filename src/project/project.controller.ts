@@ -68,7 +68,7 @@ export class ProjectController {
   })
   @Get()
   async allUserProjects(@Req() req: UserContext): Promise<Project[]> {
-    return await this.projectService.findProjectsByOwner(req.user.id);
+    return await this.projectService.findUserProjects(req.user);
   }
 
   @ApiTags('project')

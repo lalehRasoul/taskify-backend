@@ -40,6 +40,22 @@ export class TaskService {
     });
   }
 
+  async assignedTasks(assignUser: User): Promise<Task[]> {
+    const tasks: Task[] = await this.taskRepository.find({
+      where: {},
+      relations: {
+        project: {
+          users: true,
+        },
+        asign: true,
+        owner: true,
+      },
+    });
+    return tasks.filter((el) => {
+      return el.asign.id === assignUser.id;
+    });
+  }
+
   async updateTask(oldTask: Task, newTask: TaskDto): Promise<Task> {
     oldTask = { ...oldTask, ...newTask };
     await this.taskRepository.save(oldTask);

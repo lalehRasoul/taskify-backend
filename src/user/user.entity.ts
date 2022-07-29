@@ -27,9 +27,6 @@ export class User {
   @Exclude({ toPlainOnly: true })
   password: string;
 
-  @Exclude({ toPlainOnly: true })
-  private tempPassword: string;
-
   @Column({ unique: true })
   email: string;
 
@@ -47,15 +44,5 @@ export class User {
 
   @BeforeInsert() async hashPassword() {
     this.password = await bcrypt.hash(this.password, 10);
-  }
-
-  @AfterLoad() loadTempPassword() {
-    this.tempPassword = this.password;
-  }
-
-  @BeforeUpdate() async encryptPassword() {
-    if (this.tempPassword !== this.password) {
-      this.password = await bcrypt.hash(this.password, 10);
-    }
   }
 }

@@ -3,6 +3,7 @@ import {
   ClassSerializerInterceptor,
   ConflictException,
   Controller,
+  Get,
   HttpCode,
   NotFoundException,
   Param,
@@ -66,7 +67,7 @@ export class TaskController {
   @ApiTags('task')
   @ApiResponse({
     status: 200,
-    description: 'Returns the task.',
+    description: 'The task has been successfully updated.',
   })
   @Put('/:taskId')
   async updateTask(
@@ -81,6 +82,16 @@ export class TaskController {
     );
     if (!user) throw new ConflictException(messages.doesNotHavePermission);
     return this.taskService.updateTask(targetTask, body);
+  }
+
+  @ApiTags('task')
+  @ApiResponse({
+    status: 200,
+    description: 'Returns the assigned task.',
+  })
+  @Get('/assigned')
+  async assignedTasks(@Req() req: UserContext): Promise<Task[]> {
+    return this.taskService.assignedTasks(req.user);
   }
 
   @ApiTags('task')

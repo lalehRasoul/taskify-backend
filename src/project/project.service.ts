@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/user.entity';
-import { Repository } from 'typeorm';
+import { ArrayContainedBy, ArrayContains, In, Repository } from 'typeorm';
 import { Project } from './project.entity';
 import { Like } from 'typeorm';
 
@@ -28,15 +28,17 @@ export class ProjectService {
     });
   }
 
-  async findProjectsByOwner(ownerId: number): Promise<Project[]> {
-    const where: any = { owner: ownerId };
-    return await this.projectRepository.find({
-      where,
+  async findUserProjects(owner: User): Promise<Project[]> {
+    const project: Project[] = await this.projectRepository.find({
+      where: {},
       relations: {
         users: true,
         owner: true,
         tasks: true,
       },
+    });
+    return project.filter((el) => {
+      return el.users.map((el2) => el2.id).includes(owner.id);
     });
   }
 
