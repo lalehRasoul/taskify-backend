@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/user.entity';
-import { ArrayContainedBy, ArrayContains, In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Project } from './project.entity';
 import { Like } from 'typeorm';
 
@@ -12,11 +12,15 @@ export class ProjectService {
     private projectRepository: Repository<Project>,
   ) {}
 
-  async createProject(owner: User, name: string): Promise<Project> {
+  async createProject(
+    owner: User,
+    name: string,
+    users?: User[] | unknown[],
+  ): Promise<Project> {
     const newProject: Project = await this.projectRepository.create({
       owner,
       name,
-      users: [owner],
+      users,
     });
     await this.projectRepository.save(newProject);
     return newProject;

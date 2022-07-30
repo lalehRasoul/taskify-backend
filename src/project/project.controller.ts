@@ -58,7 +58,23 @@ export class ProjectController {
       body.name,
     );
     if (!!project) throw new ConflictException(messages.projectExist);
-    return this.projectService.createProject(req.user, body.name);
+    const users: User[] = await Promise.all(
+      body.users.map(async (credential) => {
+        let targetUser: User = await this.userService.findUserByUsernameOrEmail(
+          credential,
+        );
+        if (!targetUser) {
+          targetUser = await this.userService.findUserByUsernameOrEmail(
+            null,
+            credential,
+          );
+        }
+        if (!!targetUser) return targetUser;
+        else throw new NotFoundException(messages.userNotFound);
+      }),
+    );
+    users.push(req.user);
+    return this.projectService.createProject(req.user, body.name, users);
   }
 
   @ApiTags('project')
