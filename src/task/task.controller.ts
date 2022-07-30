@@ -3,6 +3,7 @@ import {
   ClassSerializerInterceptor,
   ConflictException,
   Controller,
+  Delete,
   Get,
   HttpCode,
   NotFoundException,
@@ -94,6 +95,25 @@ export class TaskController {
     );
     if (!user) throw new ConflictException(messages.doesNotHavePermission);
     return this.taskService.updateTask(targetTask, body);
+  }
+
+  @ApiTags('task')
+  @ApiResponse({
+    status: 200,
+    description: 'The task has been successfully updated.',
+  })
+  @Delete('/:taskId')
+  async deleteTask(
+    @Req() req: UserContext,
+    @Param('taskId') taskId: number,
+  ): Promise<Task> {
+    const targetTask: Task = await this.taskService.findTask(taskId);
+    if (!targetTask) throw new NotFoundException(messages.taskNotFound);
+    const user: User = targetTask.project.users.find(
+      (el) => el.id === req.user.id,
+    );
+    if (!user) throw new ConflictException(messages.doesNotHavePermission);
+    return this.taskService.removeTask(targetTask);
   }
 
   @ApiTags('task')

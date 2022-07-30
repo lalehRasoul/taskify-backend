@@ -84,4 +84,8 @@ export class TaskService {
     await this.taskRepository.save(task);
     return task;
   }
+
+  async removeTask(task: Task): Promise<any> {
+    await this.taskRepository.remove(task);
+  }
 }
