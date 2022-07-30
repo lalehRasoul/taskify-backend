@@ -23,7 +23,7 @@ import { User } from 'src/user/user.entity';
 import { UserContext } from 'src/user/user.schema';
 import { UserService } from 'src/user/user.service';
 import { Task } from './task.entity';
-import { TaskDto } from './task.schema';
+import { CreateTaskDto, TaskDto } from './task.schema';
 import { TaskService } from './task.service';
 
 @UseInterceptors(ClassSerializerInterceptor)
@@ -54,14 +54,26 @@ export class TaskController {
   @Post('/:projectId')
   async newTask(
     @Req() req: UserContext,
-    @Body() body: TaskDto,
+    @Body() body: CreateTaskDto,
     @Param('projectId') projectId: number,
   ): Promise<Task> {
+    let assign: User = undefined;
+    if (!!body.assignUser) {
+      assign = await this.userService.findUserByUsernameOrEmail(
+        body.assignUser,
+      );
+      if (!assign) {
+        assign = await this.userService.findUserByUsernameOrEmail(
+          null,
+          body.assignUser,
+        );
+      }
+    }
     const project: Project = await this.projectService.findProject(projectId);
     if (!project) throw new NotFoundException(messages.projectNotFound);
     const user: User = project.users.find((el) => el.id === req.user.id);
     if (!user) throw new ConflictException(messages.doesNotHavePermission);
-    return this.taskService.createTask(body, req.user, project);
+    return this.taskService.createTask(body, req.user, project, assign);
   }
 
   @ApiTags('task')
@@ -118,13 +130,21 @@ export class TaskController {
     status: 200,
     description: 'The task has been successfully assigned.',
   })
-  @Patch('/:taskId/:userId')
+  @Patch('/:taskId/:credential')
   async assignTo(
     @Req() req: UserContext,
     @Param('taskId') taskId: number,
-    @Param('userId') userId: number,
+    @Param('credential') credential: string,
   ): Promise<Task> {
-    const targetUser: User = await this.userService.findUserById(userId);
+    let targetUser: User = await this.userService.findUserByUsernameOrEmail(
+      credential,
+    );
+    if (!targetUser) {
+      targetUser = await this.userService.findUserByUsernameOrEmail(
+        null,
+        credential,
+      );
+    }
     if (!targetUser) throw new NotFoundException(messages.userNotFound);
     const targetTask: Task = await this.taskService.findTask(taskId);
     if (!targetTask) throw new NotFoundException(messages.taskNotFound);

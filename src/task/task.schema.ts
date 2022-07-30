@@ -14,3 +14,21 @@ export class TaskDto {
   @IsOptional()
   checked: boolean;
 }
+
+export class CreateTaskDto {
+  @ApiProperty({ default: 'test' })
+  @IsNotEmpty()
+  title: string;
+
+  @ApiProperty({ default: 'test test test' })
+  @IsNotEmpty()
+  note: string;
+
+  @ApiProperty({ default: false })
+  @IsOptional()
+  checked: boolean;
+
+  @ApiProperty()
+  @IsOptional()
+  assignUser: string;
+}

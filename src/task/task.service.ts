@@ -17,12 +17,23 @@ export class TaskService {
     newTask: TaskDto,
     owner: User,
     project: Project,
+    asign?: User | undefined,
   ): Promise<Task> {
-    const task: Task = await this.taskRepository.create({
-      ...newTask,
-      owner,
-      project,
-    });
+    let task: Task;
+    if (!!asign) {
+      task = await this.taskRepository.create({
+        ...newTask,
+        owner,
+        project,
+        asign,
+      });
+    } else {
+      task = await this.taskRepository.create({
+        ...newTask,
+        owner,
+        project,
+      });
+    }
     await this.taskRepository.save(task);
     return task;
   }
@@ -52,7 +63,7 @@ export class TaskService {
       },
     });
     return tasks.filter((el) => {
-      return el.asign.id === assignUser.id;
+      return el?.asign?.id === assignUser.id;
     });
   }
 
