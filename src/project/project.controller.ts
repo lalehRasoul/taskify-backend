@@ -73,7 +73,9 @@ export class ProjectController {
         else throw new NotFoundException(messages.userNotFound);
       }),
     );
-    users.push(req.user);
+    if (!users.find((el) => el.id === req.user.id)) {
+      users.push(req.user);
+    }
     return this.projectService.createProject(req.user, body.name, users);
   }
 
@@ -112,6 +114,9 @@ export class ProjectController {
       req.user.id,
     );
     if (!targetProject) throw new NotFoundException(messages.projectNotFound);
+    if (targetProject.owner.id !== req.user.id) {
+      throw new ConflictException(messages.doesNotHavePermission);
+    }
     await this.projectService.removeProject(targetProject);
   }
 
@@ -131,7 +136,29 @@ export class ProjectController {
       req.user.id,
     );
     if (!targetProject) throw new NotFoundException(messages.projectNotFound);
-    return this.projectService.updateProject(targetProject.id, body.name);
+    const users: User[] = await Promise.all(
+      body.users.map(async (credential) => {
+        let targetUser: User = await this.userService.findUserByUsernameOrEmail(
+          credential,
+        );
+        if (!targetUser) {
+          targetUser = await this.userService.findUserByUsernameOrEmail(
+            null,
+            credential,
+          );
+        }
+        if (!!targetUser) return targetUser;
+        else throw new NotFoundException(messages.userNotFound);
+      }),
+    );
+    if (!users.find((el) => el.id === req.user.id)) {
+      users.push(req.user);
+    }
+    return this.projectService.updateProject(
+      targetProject.id,
+      body.name,
+      users,
+    );
   }
 
   @ApiTags('project')

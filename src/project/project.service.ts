@@ -15,7 +15,7 @@ export class ProjectService {
   async createProject(
     owner: User,
     name: string,
-    users?: User[] | unknown[],
+    users: User[],
   ): Promise<Project> {
     const newProject: Project = await this.projectRepository.create({
       owner,
@@ -66,16 +66,16 @@ export class ProjectService {
     await this.projectRepository.remove(project);
   }
 
-  async updateProject(projectId: number, name: string): Promise<Project> {
-    await this.projectRepository.update({ id: projectId }, { name });
-    return this.projectRepository.findOne({
-      where: { id: projectId },
-      relations: {
-        users: true,
-        owner: true,
-        tasks: true,
-      },
-    });
+  async updateProject(
+    projectId: number,
+    name: string,
+    users: User[],
+  ): Promise<Project> {
+    const project: Project = await this.findProject(projectId);
+    project.name = name;
+    project.users = [...users];
+    this.projectRepository.save(project);
+    return project;
   }
 
   async addUserToProject(project: Project, user: User): Promise<Project> {
