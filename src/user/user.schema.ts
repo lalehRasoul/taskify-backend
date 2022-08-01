@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import { User } from './user.entity';
@@ -15,6 +15,22 @@ export class CreateUserDto {
   @ApiProperty({ default: 'test123' })
   @Exclude({ toPlainOnly: true })
   @IsNotEmpty()
+  password: string;
+}
+
+export class UpdateUserDto {
+  @ApiProperty({ default: 'test' })
+  @IsOptional()
+  username: string;
+
+  @ApiProperty({ default: 'test@gmail.com' })
+  @IsEmail()
+  @IsOptional()
+  email: string;
+
+  @ApiProperty({ default: 'test123' })
+  @Exclude({ toPlainOnly: true })
+  @IsOptional()
   password: string;
 }
 

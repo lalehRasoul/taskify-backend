@@ -57,7 +57,9 @@ export class ProjectService {
       relations: {
         users: true,
         owner: true,
-        tasks: true,
+        tasks: {
+          owner: true,
+        },
       },
     });
   }

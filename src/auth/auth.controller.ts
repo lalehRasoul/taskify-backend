@@ -3,7 +3,9 @@ import {
   ClassSerializerInterceptor,
   ConflictException,
   Controller,
+  forwardRef,
   HttpCode,
+  Inject,
   NotFoundException,
   Post,
   UseInterceptors,
@@ -19,6 +21,7 @@ import { AuthService } from './auth.service';
 @Controller('auth')
 export class AuthController {
   constructor(
+    @Inject(forwardRef(() => UserService))
     private userService: UserService,
     private authService: AuthService,
   ) {}

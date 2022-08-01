@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { User } from './user.entity';
-import { CreateUserDto, LoginDto } from './user.schema';
+import { CreateUserDto, LoginDto, UpdateUserDto } from './user.schema';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -56,5 +56,27 @@ export class UserService {
     const where = { id: Not(id) };
     if (!id) delete where.id;
     return this.usersRepository.find({ where });
+  }
+
+  async updateUser(user: User, newInfo: UpdateUserDto): Promise<User> {
+    if (!!newInfo.username) {
+      user.username = newInfo.username;
+    }
+    if (!!newInfo.email) {
+      user.email = newInfo.email;
+    }
+    if (!!newInfo.password) {
+      const isMatch = await bcrypt.compare(user.password, newInfo.password);
+      if (!isMatch) {
+        delete user.password;
+        user.password = await bcrypt.hash(newInfo.password, 10);
+      }
+    }
+    await this.usersRepository.save(user);
+    return user;
+  }
+
+  async deleteAccount(user: User): Promise<void> {
+    await this.usersRepository.remove(user);
   }
 }
