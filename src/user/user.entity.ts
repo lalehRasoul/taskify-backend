@@ -37,7 +37,8 @@ export class User {
   updated_at: Date;
 
   @ManyToMany(() => Project, (project) => project.users, {
-    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   @JoinTable()
   projects: Relation<Project[]>;

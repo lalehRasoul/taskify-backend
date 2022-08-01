@@ -94,13 +94,18 @@ export class TaskController {
       (el) => el.id === req.user.id,
     );
     if (!user) throw new ConflictException(messages.doesNotHavePermission);
+    if (targetTask.title !== body.title) {
+      if (targetTask.owner.id !== req.user.id) {
+        throw new ConflictException(messages.doesNotHavePermission);
+      }
+    }
     return this.taskService.updateTask(targetTask, body);
   }
 
   @ApiTags('task')
   @ApiResponse({
     status: 200,
-    description: 'The task has been successfully updated.',
+    description: 'The task has been successfully deleted.',
   })
   @Delete('/:taskId')
   async deleteTask(
@@ -109,10 +114,9 @@ export class TaskController {
   ): Promise<Task> {
     const targetTask: Task = await this.taskService.findTask(taskId);
     if (!targetTask) throw new NotFoundException(messages.taskNotFound);
-    const user: User = targetTask.project.users.find(
-      (el) => el.id === req.user.id,
-    );
-    if (!user) throw new ConflictException(messages.doesNotHavePermission);
+    if (targetTask.owner.id !== req.user.id) {
+      throw new ConflictException(messages.doesNotHavePermission);
+    }
     return this.taskService.removeTask(targetTask);
   }
 
@@ -138,10 +142,10 @@ export class TaskController {
   ): Promise<Task> {
     const targetTask: Task = await this.taskService.findTask(taskId);
     if (!targetTask) throw new NotFoundException(messages.taskNotFound);
-    const user: User = targetTask.project.users.find(
-      (el) => el.id === req.user.id,
-    );
-    if (!user) throw new ConflictException(messages.doesNotHavePermission);
+    // const user: User = targetTask.project.users.find(
+    //   (el) => el.id === req.user.id,
+    // );
+    // if (!user) throw new ConflictException(messages.doesNotHavePermission);
     return this.taskService.changeCheckField(targetTask);
   }
 

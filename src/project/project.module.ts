@@ -1,5 +1,6 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TaskModule } from 'src/task/task.module';
 import { UserModule } from 'src/user/user.module';
 import { ProjectController } from './project.controller';
 import { Project } from './project.entity';

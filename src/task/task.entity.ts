@@ -31,15 +31,20 @@ export class Task {
   updated_at: Date;
 
   @ManyToOne(() => User, (user) => user.id, {
-    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   owner: Relation<User>;
 
   @ManyToOne(() => User, (user) => user.id, {
-    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   asign: Relation<User>;
 
-  @ManyToOne(() => Project, (project) => project.id)
+  @ManyToOne(() => Project, (project) => project.id, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   project: Relation<Project>;
 }

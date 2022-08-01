@@ -32,17 +32,22 @@ export class Project {
   updated_at: Date;
 
   @ManyToOne(() => User, (user) => user.id, {
-    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'ownerId' })
   owner: Relation<User>;
 
-  @ManyToMany(() => User, (user) => user.projects)
+  @ManyToMany(() => User, (user) => user.projects, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn()
   users: Relation<User[]>;
 
   @OneToMany(() => Task, (task) => task.project, {
-    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   tasks: Relation<Task[]>;
 }
