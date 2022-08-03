@@ -45,6 +45,19 @@ export class LoginDto {
   password: string;
 }
 
+export class RecoveryEmailDto {
+  @ApiProperty({ default: 'test@gmail.com', description: 'email address' })
+  @IsEmail()
+  @IsNotEmpty()
+  credential: string;
+}
+
+export class ChangePasswordByRecoveryMailDto {
+  @ApiProperty({ default: 'test123', description: 'password' })
+  @IsNotEmpty()
+  password: string;
+}
+
 export class UserPayload {
   id: number;
 

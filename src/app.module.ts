@@ -8,6 +8,7 @@ import { TaskModule } from './task/task.module';
 import { Task } from './task/task.entity';
 import { AuthModule } from './auth/auth.module';
 import { config } from './constants';
+import { UtilsModule } from './utils/utils.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { config } from './constants';
     ProjectModule,
     TaskModule,
     AuthModule,
+    UtilsModule,
   ],
 })
 export class AppModule {}

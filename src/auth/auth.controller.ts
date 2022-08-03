@@ -7,14 +7,23 @@ import {
   HttpCode,
   Inject,
   NotFoundException,
+  Param,
   Post,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { messages } from 'src/constants';
+import { config, messages } from 'src/constants';
 import { User } from 'src/user/user.entity';
-import { CreateUserDto, LoginDto } from 'src/user/user.schema';
+import {
+  ChangePasswordByRecoveryMailDto,
+  CreateUserDto,
+  LoginDto,
+  RecoveryEmailDto,
+  UpdateUserDto,
+} from 'src/user/user.schema';
 import { UserService } from 'src/user/user.service';
+import { EmailOptionsDto } from 'src/utils/utils.schema';
+import { UtilsService } from 'src/utils/utils.service';
 import { AuthService } from './auth.service';
 
 @UseInterceptors(ClassSerializerInterceptor)
@@ -24,6 +33,7 @@ export class AuthController {
     @Inject(forwardRef(() => UserService))
     private userService: UserService,
     private authService: AuthService,
+    private utilsService: UtilsService,
   ) {}
 
   @ApiTags('auth')
@@ -71,5 +81,54 @@ export class AuthController {
       user: targetUser,
       access_token: await this.authService.login(targetUser),
     };
+  }
+
+  @ApiTags('auth')
+  @ApiResponse({
+    status: 200,
+    description: 'The recovery email has been successfully sent.',
+  })
+  @Post('recovery')
+  async sendRecoveryEmail(@Body() user: RecoveryEmailDto): Promise<null> {
+    const targetUser: User = await this.userService.findUserByCredentials(user);
+    if (targetUser === null) return null;
+    const linkId: string = await this.utilsService.createRecoveryEmailLink(
+      targetUser,
+    );
+    const emailOptions: EmailOptionsDto = new EmailOptionsDto();
+    emailOptions.to = targetUser.email;
+    emailOptions.html = this.utilsService.generateRecoveryEmailTemplate(
+      `${config.NODE_MAILER.WEBSITE}/recovery/${linkId}`,
+      targetUser.username,
+    );
+    await this.utilsService.sendEmail(emailOptions);
+    return null;
+  }
+
+  @ApiTags('auth')
+  @ApiResponse({
+    status: 200,
+    description: 'The password has been successfully updated.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found.',
+  })
+  @Post('recovery/:rcode')
+  async submitPassword(
+    @Body() user: ChangePasswordByRecoveryMailDto,
+    @Param('rcode') rcode: string,
+  ): Promise<null> {
+    const userId: string = await this.utilsService.getIdByRCode(rcode);
+    if (!userId) throw new NotFoundException(messages.userNotFound);
+    const targetUser: User = await this.userService.findUserById(
+      Number(userId),
+    );
+    if (targetUser === null) throw new NotFoundException(messages.userNotFound);
+    await this.userService.updateUser(targetUser, {
+      password: user.password,
+    } as UpdateUserDto);
+    await this.utilsService.deleteRcode(rcode);
+    return null;
   }
 }

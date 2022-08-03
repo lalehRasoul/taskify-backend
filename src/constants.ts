@@ -19,4 +19,14 @@ export const config = {
     HOST: 'localhost',
     PORT: 3306,
   },
+  NODE_MAILER: {
+    HOST: 'mail.articlesland.ir',
+    PORT: 465,
+    SECURE: true,
+    USERNAME: 'admin@articlesland.ir',
+    PASSWORD: '1379ali9731',
+    FROM: '"Articlesland Contact" <admin@articlesland.ir>',
+    SUBJECT: 'Recovery Password Email',
+    WEBSITE: 'http://localhost:3000',
+  },
 };

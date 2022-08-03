@@ -7,8 +7,6 @@ import {
   UseGuards,
   Put,
   Body,
-  Param,
-  ForbiddenException,
   ConflictException,
   Delete,
 } from '@nestjs/common';

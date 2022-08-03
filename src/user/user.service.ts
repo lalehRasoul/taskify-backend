@@ -2,7 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { User } from './user.entity';
-import { CreateUserDto, LoginDto, UpdateUserDto } from './user.schema';
+import {
+  CreateUserDto,
+  LoginDto,
+  RecoveryEmailDto,
+  UpdateUserDto,
+} from './user.schema';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -30,7 +35,9 @@ export class UserService {
     return null;
   }
 
-  async findUserByCredentials(user: LoginDto): Promise<User> {
+  async findUserByCredentials(
+    user: LoginDto | RecoveryEmailDto,
+  ): Promise<User> {
     let targetUser = await this.usersRepository.findOneBy({
       username: user.credential,
     });
@@ -39,12 +46,19 @@ export class UserService {
         email: user.credential,
       });
     }
-    if (!!targetUser) {
-      const isMatch = await bcrypt.compare(user.password, targetUser.password);
-      if (!isMatch) return null;
-      return targetUser;
+    if (user instanceof LoginDto) {
+      if (!!targetUser) {
+        const isMatch = await bcrypt.compare(
+          user.password,
+          targetUser.password,
+        );
+        if (!isMatch) return null;
+        return targetUser;
+      } else {
+        return null;
+      }
     } else {
-      return null;
+      return targetUser;
     }
   }
 
