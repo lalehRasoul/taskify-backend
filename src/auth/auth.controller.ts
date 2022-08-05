@@ -89,8 +89,11 @@ export class AuthController {
     description: 'The recovery email has been successfully sent.',
   })
   @Post('recovery')
-  async sendRecoveryEmail(@Body() user: RecoveryEmailDto): Promise<null> {
-    const targetUser: User = await this.userService.findUserByCredentials(user);
+  async sendRecoveryEmail(@Body() body: RecoveryEmailDto): Promise<null> {
+    const targetUser = await this.userService.findUserByUsernameOrEmail(
+      null,
+      body.credential,
+    );
     if (targetUser === null) return null;
     const linkId: string = await this.utilsService.createRecoveryEmailLink(
       targetUser,

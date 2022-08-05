@@ -35,9 +35,7 @@ export class UserService {
     return null;
   }
 
-  async findUserByCredentials(
-    user: LoginDto | RecoveryEmailDto,
-  ): Promise<User> {
+  async findUserByCredentials(user: LoginDto): Promise<User> {
     let targetUser = await this.usersRepository.findOneBy({
       username: user.credential,
     });
@@ -46,19 +44,12 @@ export class UserService {
         email: user.credential,
       });
     }
-    if (user instanceof LoginDto) {
-      if (!!targetUser) {
-        const isMatch = await bcrypt.compare(
-          user.password,
-          targetUser.password,
-        );
-        if (!isMatch) return null;
-        return targetUser;
-      } else {
-        return null;
-      }
-    } else {
+    if (!!targetUser) {
+      const isMatch = await bcrypt.compare(user.password, targetUser.password);
+      if (!isMatch) return null;
       return targetUser;
+    } else {
+      return null;
     }
   }
 
